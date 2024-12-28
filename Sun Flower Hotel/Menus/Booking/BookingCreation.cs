@@ -20,9 +20,24 @@ namespace Sun_Flower_Hotel.Menu.Booking_Menu
                     AnsiConsole.Markup("[bold yellow]Create a Booking[/]\n");
 
                     var guestId = AnsiConsole.Ask<int>("Enter [yellow]Guest ID[/]:");
-                    var roomNumber = AnsiConsole.Ask<int>("Enter [yellow]Room Number[/]:");
-
-                    var checkInDate = SelectDate("Select [yellow]Check-In Date[/]:");
+                using (var context = new HotelDbContext())
+                {
+                    if (!context.Guests.Any(g => g.GuestId == guestId))
+                    {
+                        AnsiConsole.Markup("[red]Error: Guest with ID [/][yellow]{guestId}[/][red] does not exist.[/]\n");
+                        return;
+                    }
+                }
+                var roomNumber = AnsiConsole.Ask<int>("Enter [yellow]Room Number[/]:");
+                using (var context = new HotelDbContext())
+                {
+                    if (!context.Rooms.Any(r => r.RoomNumber == roomNumber))
+                    {
+                        AnsiConsole.Markup("[red]Error: Room number [/][yellow]{roomNumber}[/][red] does not exist.[/]\n");
+                        return;
+                    }
+                }
+                var checkInDate = SelectDate("Select [yellow]Check-In Date[/]:");
                     var checkOutDate = SelectDate("Select [yellow]Check-Out Date[/]:");
 
                     if (checkOutDate <= checkInDate)

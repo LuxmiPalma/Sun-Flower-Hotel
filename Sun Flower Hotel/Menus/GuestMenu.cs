@@ -52,17 +52,37 @@ namespace Sun_Flower_Hotel.Menus
                 AnsiConsole.Clear();
                 AnsiConsole.Markup("[bold yellow]Add New Guest[/]\n");
 
+                // Get Guest Name
                 var name = AnsiConsole.Ask<string>("Enter [yellow]Guest Name[/]:");
-                var contactNumber = AnsiConsole.Ask<string>("Enter [yellow]Contact Number[/]:");
-                var email = AnsiConsole.Ask<string>("Enter [yellow]Email[/]:");
 
+                // Get and validate Contact Number
+                string contactNumber;
+                while (true)
+                {
+                    contactNumber = AnsiConsole.Ask<string>("Enter [yellow]Contact Number[/] (must be numeric):");
+                    if (long.TryParse(contactNumber, out _)) break;
+                    AnsiConsole.Markup("[red]Invalid contact number! Please enter a numeric value.[/]\n");
+                }
+
+                // Get and validate Email with the option to skip
+                string email = AnsiConsole.Prompt(
+                    new TextPrompt<string>("Enter [yellow]Email[/] (press Enter to skip):")
+                        .AllowEmpty()
+                        .Validate(input =>
+                        {
+                            if (string.IsNullOrEmpty(input) || IsValidEmail(input))
+                                return ValidationResult.Success();
+                            return ValidationResult.Error("[red]Invalid email format! Please enter a valid email or leave it blank to skip.[/]");
+                        }));
+
+                // Save the guest to the database
                 using (var context = new HotelDbContext())
                 {
                     var guest = new Guest
                     {
                         Name = name,
                         ContactNumber = contactNumber,
-                        Email = email
+                        Email = string.IsNullOrEmpty(email) ? null : email // Handle skipped email
                     };
 
                     context.Guests.Add(guest);
@@ -75,6 +95,21 @@ namespace Sun_Flower_Hotel.Menus
                 AnsiConsole.Markup($"[red]Error: {ex.Message}[/]\n");
             }
         }
+
+        // Helper method to validate email format
+        private bool IsValidEmail(string email)
+        {
+            try
+            {
+                var mailAddress = new System.Net.Mail.MailAddress(email);
+                return mailAddress.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
 
         private void ViewAllGuests()
         {
@@ -103,9 +138,10 @@ namespace Sun_Flower_Hotel.Menus
                     {
                         table.AddRow(
                             guest.GuestId.ToString(),
-                            guest.Name,
-                            guest.ContactNumber,
-                            guest.Email);
+                            guest.Name ?? "N/A", // Handle null Name
+                            guest.ContactNumber ?? "N/A", // Handle null Contact Number
+                            guest.Email ?? "N/A" // Handle null Email
+                        );
                     }
 
                     AnsiConsole.Write(table);
@@ -116,6 +152,7 @@ namespace Sun_Flower_Hotel.Menus
                 AnsiConsole.Markup($"[red]Error: {ex.Message}[/]\n");
             }
         }
+
 
         private void EditGuest()
         {

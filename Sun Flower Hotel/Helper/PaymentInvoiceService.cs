@@ -40,7 +40,7 @@ namespace Sun_Flower_Hotel.Helper
             // Log details of each invoice
             foreach (var invoice in invoices)
             {
-                Console.WriteLine($"Debug: Invoice ID = {invoice.PaymentInvoiceId}, Booking ID = {invoice.BookingId}, Amount = {invoice.Amount}, Status = {invoice.PaymentStatus}");
+                //Console.WriteLine($"Debug: Invoice ID = {invoice.PaymentInvoiceId}, Booking ID = {invoice.BookingId}, Amount = {invoice.Amount}, Status = {invoice.PaymentStatus}");
             }
 
             return invoices;

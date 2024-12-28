@@ -75,14 +75,17 @@ namespace Sun_Flower_Hotel.Menus
             AnsiConsole.Clear();
             AnsiConsole.Markup("[bold yellow]View All Invoices[/]\n");
 
+            // Fetch all invoices
             var invoices = service.GetAllInvoices();
 
+            // Check if there are invoices to display
             if (!invoices.Any())
             {
                 AnsiConsole.Markup("[red]No invoices found.[/]\n");
                 return;
             }
 
+            // Create a table with all columns, including Invoice Date
             var table = new Table()
                 .Centered()
                 .AddColumn("[cyan]Invoice ID[/]")
@@ -91,22 +94,29 @@ namespace Sun_Flower_Hotel.Menus
                 .AddColumn("[cyan]Payment Date[/]")
                 .AddColumn("[cyan]Payment Method[/]")
                 .AddColumn("[cyan]Payment Status[/]")
+                .AddColumn("[cyan]Invoice Date[/]")
                 .AddColumn("[cyan]Invoice Notes[/]");
 
+            // Add rows to the table
             foreach (var invoice in invoices)
             {
                 table.AddRow(
                     invoice.PaymentInvoiceId.ToString(),
                     invoice.BookingId.ToString(),
                     $"{invoice.Amount:C}", // Formats as currency
-                    invoice.PaymentDate?.ToShortDateString() ?? "Not Paid", // Handles null PaymentDate                    invoice.PaymentMethod ?? "N/A",
-                    invoice.PaymentStatus ?? "N/A",
-                    invoice.InvoiceNotes ?? "N/A"
+                    invoice.PaymentDate?.ToShortDateString() ?? "[red]Not Paid[/]", // Null-safe Payment Date
+                    invoice.PaymentMethod ?? "[yellow]N/A[/]", // Null-safe Payment Method
+                    invoice.PaymentStatus ?? "[yellow]N/A[/]", // Null-safe Payment Status
+                    invoice.InvoiceDate.ToShortDateString() ?? "[yellow]N/A[/]", // Null-safe Invoice Date
+                    invoice.InvoiceNotes?.Replace("\n", " ") ?? "[yellow]N/A[/]" // Null-safe Notes, replaces newlines
                 );
             }
 
+            // Display the table
             AnsiConsole.Write(table);
         }
+
+
 
         private static void UpdateInvoice(PaymentInvoiceService service)
         {

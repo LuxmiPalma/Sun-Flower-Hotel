@@ -66,8 +66,15 @@ namespace Sun_Flower_Hotel.Menus
             using (var context = new HotelDbContext())
             {
                 var name = AnsiConsole.Ask<string>("Enter [yellow]Employee Name[/]:");
-                var contactNumber = AnsiConsole.Ask<string>("Enter [yellow]Contact Number[/]:");
-
+                // Validate Contact Number
+                string contactNumber;
+                while (true)
+                {
+                    contactNumber = AnsiConsole.Ask<string>("Enter [yellow]Contact Number[/] (must be numeric):");
+                    if (long.TryParse(contactNumber, out _)) // Validate that it's numeric
+                        break;
+                    AnsiConsole.Markup("[red]Contact number must be numeric. Please try again.[/]\n");
+                }
                 // Optional Email
                 var email = AnsiConsole.Prompt(
                     new TextPrompt<string>("Enter [yellow]Email Address (optional)[/] (press Enter to skip):")
