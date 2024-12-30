@@ -144,7 +144,7 @@ namespace Sun_Flower_Hotel.Menus
                         room.MaxGuests.ToString(),
                         room.IsAvailable ? "[green]Yes[/]" : "[red]No[/]");
                 }
-
+                // Display the table
                 AnsiConsole.Write(table);
             }
             catch (Exception ex)
